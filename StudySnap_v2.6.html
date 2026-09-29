@@ -304,17 +304,17 @@ function autoFinishTimed(){
 
   clearInterval(timerInterval);
   timerInterval=null;
+  timeLeft=0;
 
-  currentQuiz.forEach((q,i)=>{
-    if(userAnswers[i]===undefined){
-      userAnswers[i]=null;
+  for(let i=0;i<currentQuiz.length;i++){
+    if(!userAnswers[i]){
+      userAnswers[i]={selected:null,answered:false,timedOut:true};
     }
-  });
+  }
 
   quizFinished=true;
   showReview();
-}
-}
+  }
 function renderQuestion(){
   const q=currentQuiz[currentIndex], state=userAnswers[currentIndex]||{selected:null,answered:false,timedOut:false};
   answered=state.answered;
@@ -702,13 +702,6 @@ if(d==='easy'){
 }
 
 // Repeat questions when the selected count is larger than the available bank.
-if(pool.length < requested){
-  const original=[...pool];
-  while(pool.length < requested){
-    pool.push(...original);
-  }
-  pool=pool.slice(0,requested);
-  }
 
   for(let i=pool.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
@@ -733,23 +726,7 @@ for(const item of pool){
   }
 }
 
-if(unique.length < requested){
-  const original=[...unique];
-  let i=0;
-
-  while(unique.length < requested){
-    const base=original[i % original.length];
-
-    unique.push({
-      ...base,
-      q:base.q + ' (Practice ' + (unique.length + 1) + ')'
-    });
-
-    i++;
-  }
-}
-
-return unique.slice(0,requested);
+return unique.slice(0, Math.min(requested, unique.length));
                       }
 
 </script>
