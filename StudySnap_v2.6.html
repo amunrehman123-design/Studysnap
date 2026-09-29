@@ -424,6 +424,132 @@ function getDifficultyQuestions(subject, difficulty, count){
   const s=(subject||"").toLowerCase();
   const d=(difficulty||"medium").toLowerCase();
 
+  const banks={
+    easy:{
+      biology:[
+        ["Which organelle is known as the powerhouse of the cell?",["Nucleus","Mitochondrion","Ribosome","Golgi apparatus"],1],
+        ["Which gas do plants take in for photosynthesis?",["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"],2],
+        ["How many chambers does the human heart have?",["2","3","4","5"],2],
+        ["Which blood cells fight infections?",["Red blood cells","White blood cells","Platelets","Plasma"],1],
+        ["What is the basic unit of life?",["Tissue","Organ","Cell","Atom"],2],
+        ["Which organ filters blood and produces urine?",["Heart","Liver","Kidney","Lung"],2],
+        ["Which vitamin is produced in skin in sunlight?",["Vitamin A","Vitamin B","Vitamin C","Vitamin D"],3],
+        ["What is the process by which plants make food?",["Respiration","Photosynthesis","Digestion","Excretion"],1],
+        ["Which part of a plant absorbs water?",["Flower","Root","Fruit","Stem"],1],
+        ["Which molecule carries genetic information?",["ATP","DNA","Glucose","Water"],1]
+      ],
+      chemistry:[
+        ["What is the chemical symbol for sodium?",["S","Na","So","N"],1],
+        ["What is the pH of a neutral solution?",["0","5","7","14"],2],
+        ["Which particle has a negative charge?",["Proton","Neutron","Electron","Nucleus"],2],
+        ["What is the formula of water?",["CO2","H2O","O2","H2"],1],
+        ["Which gas is most abundant in Earth's atmosphere?",["Oxygen","Hydrogen","Nitrogen","Carbon dioxide"],2],
+        ["What is an acid with pH below 7?",["Acidic","Neutral","Basic","Metallic"],0],
+        ["Which element has atomic number 1?",["Helium","Hydrogen","Oxygen","Carbon"],1],
+        ["What type of bond involves sharing electrons?",["Ionic","Covalent","Metallic","Hydrogen"],1],
+        ["Which substance is commonly called table salt?",["NaCl","KCl","CaCO3","HCl"],0],
+        ["What is the smallest unit of an element?",["Molecule","Atom","Compound","Ion"],1]
+      ],
+      physics:[
+        ["What is the SI unit of force?",["Joule","Newton","Watt","Pascal"],1],
+        ["What is the speed of light approximately?",["3×10⁸ m/s","3×10⁶ m/s","3×10⁴ m/s","3×10² m/s"],0],
+        ["What is the SI unit of energy?",["Newton","Watt","Joule","Volt"],2],
+        ["Which instrument measures electric current?",["Voltmeter","Ammeter","Barometer","Thermometer"],1],
+        ["What force pulls objects toward Earth?",["Friction","Magnetism","Gravity","Tension"],2],
+        ["What is the unit of electric resistance?",["Volt","Ampere","Ohm","Watt"],2],
+        ["Which quantity has both magnitude and direction?",["Mass","Speed","Distance","Velocity"],3],
+        ["What is the acceleration due to gravity near Earth?",["9.8 m/s²","98 m/s²","0.98 m/s²","1 m/s²"],0],
+        ["Which device converts electrical energy into light?",["Motor","Lamp","Generator","Transformer"],1],
+        ["What type of energy does a moving object have?",["Potential","Kinetic","Chemical","Nuclear"],1]
+      ],
+      mathematics:[
+        ["What is 7 × 8?",["54","56","64","48"],1],
+        ["What is the square root of 81?",["7","8","9","10"],2],
+        ["What is 15% of 200?",["15","20","30","40"],2],
+        ["If x+5=12, what is x?",["5","6","7","8"],2],
+        ["What is 2³?",["6","8","9","12"],1],
+        ["What is the value of 5²?",["10","15","20","25"],3],
+        ["What is 1/2 + 1/4?",["1/4","1/2","3/4","1"],2],
+        ["How many degrees are in a right angle?",["45°","90°","180°","360°"],1],
+        ["What is the perimeter of a square with side 5 cm?",["10 cm","15 cm","20 cm","25 cm"],2],
+        ["What is 100 ÷ 4?",["20","25","30","40"],1]
+      ],
+      cybersecurity:[
+        ["What does a strong password help prevent?",["Typing errors","Unauthorized access","Slow internet","Screen damage"],1],
+        ["What does phishing attempt to steal?",["Electricity","Personal information","Screen size","Battery power"],1],
+        ["What is malware?",["A type of hardware","Malicious software","A web browser","A password manager"],1],
+        ["What does VPN stand for?",["Virtual Private Network","Verified Public Network","Visual Protected Node","Virtual Personal Number"],0],
+        ["What should you do with a suspicious link?",["Open it","Share it","Avoid clicking it","Download it"],2],
+        ["What is two-factor authentication?",["Two passwords only","An extra verification step","Two usernames","Two browsers"],1],
+        ["What does antivirus software help detect?",["Malware","Printers","Keyboards","Monitors"],0],
+        ["What is encryption used for?",["Protecting data","Increasing brightness","Cooling computers","Deleting hardware"],0],
+        ["What is a firewall designed to control?",["Network traffic","Screen color","Battery level","Keyboard speed"],0],
+        ["What is a security patch?",["A software update fixing security issues","A new cable","A screen protector","A password"],0]
+      ],
+      artificialintelligence:[
+        ["What does AI stand for?",["Automated Internet","Artificial Intelligence","Advanced Input","Artificial Internet"],1],
+        ["What is machine learning?",["A type of keyboard","Learning patterns from data","Repairing hardware","Creating passwords"],1],
+        ["What is a dataset?",["A collection of data","A computer cable","A password","A processor"],0],
+        ["What is a chatbot?",["A program that can converse with users","A battery","A monitor","A network cable"],0],
+        ["What is computer vision?",["AI understanding images or video","Computer repair","Typing quickly","Network security"],0],
+        ["What is training data?",["Data used to train a model","Deleted files","A password","A graphics card"],0],
+        ["What is an algorithm?",["A step-by-step procedure","A computer screen","A virus","A battery"],0],
+        ["What is an AI model?",["A system trained to perform tasks from data","A keyboard","A cable","A browser tab"],0],
+        ["What is natural language processing?",["Processing human language","Processing electricity","Repairing computers","Designing screens"],0],
+        ["What is automation?",["Using technology to perform tasks automatically","Turning off a computer","Typing passwords","Installing a monitor"],0]
+      ],
+      computing:[
+        ["What does CPU stand for?",["Central Processing Unit","Computer Personal Unit","Central Program Utility","Control Processing User"],0],
+        ["What does RAM provide?",["Temporary working memory","Permanent paper storage","Internet access","Power generation"],0],
+        ["What is an operating system?",["Software that manages computer resources","A keyboard","A cable","A printer"],0],
+        ["What is HTML used for?",["Structuring web pages","Editing photos","Charging phones","Scanning viruses"],0],
+        ["What is a database?",["An organized collection of data","A monitor","A battery","A keyboard"],0],
+        ["What is software?",["Programs and instructions","Physical components","Electricity","A computer desk"],0],
+        ["What is hardware?",["Physical computer components","Web pages","Passwords","Programs"],0],
+        ["What is a browser used for?",["Accessing websites","Cooling a CPU","Charging a laptop","Printing money"],0],
+        ["What is a programming language?",["A language used to write computer programs","A spoken language only","A hardware component","A cable type"],0],
+        ["What is a file?",["A stored collection of data","A monitor","A processor","A network"],0]
+      ],
+      english:[
+        ["Choose the correct spelling:",["Recieve","Receive","Receeve","Receve"],1],
+        ["What is the opposite of 'hot'?",["Warm","Cold","Heat","Fire"],1],
+        ["Which is a noun?",["Run","Beautiful","Teacher","Quickly"],2],
+        ["Choose the correct article: ___ apple.",["A","An","Thee","No"],1],
+        ["What is the past tense of 'go'?",["Goed","Gone","Went","Going"],2],
+        ["Which word is a synonym of 'happy'?",["Sad","Joyful","Angry","Tired"],1],
+        ["Which sentence is correct?",["She are happy.","She is happy.","She am happy.","She be happy."],1],
+        ["What is the plural of 'child'?",["Childs","Childes","Children","Childrens"],2],
+        ["Which word is an adjective?",["Quickly","Beauty","Beautiful","Run"],2],
+        ["What punctuation ends a question?",[".","!",",","?"],3]
+      ]
+    }
+  };
+
+  const subjectKey=
+    s.includes("bio")?"biology":
+    s.includes("chem")?"chemistry":
+    s.includes("phys")?"physics":
+    s.includes("math")?"mathematics":
+    s.includes("cyber")?"cybersecurity":
+    s.includes("artificial")||s==="ai"?"artificialintelligence":
+    s.includes("comput")?"computing":
+    s.includes("english")?"english":"biology";
+
+  let bank=banks.easy[subjectKey]||banks.easy.biology;
+
+  const shuffled=[...bank].sort(()=>Math.random()-0.5);
+  const out=[];
+
+  for(let i=0;i<count;i++){
+    const q=shuffled[i%shuffled.length];
+    out.push({q:q[0],a:q[1],c:q[2],e:""});
+  }
+
+  return out;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              }
+  const s=(subject||"").toLowerCase();
+  const d=(difficulty||"medium").toLowerCase();
+
   const banks = {
     easy: {
       biology:[
