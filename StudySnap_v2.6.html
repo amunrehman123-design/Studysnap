@@ -261,82 +261,6 @@ function previewPhoto(e){const f=e.target.files[0];if(!f)return;$('photoPreview'
 function loadTxt(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('notes').value=r.result};r.readAsText(f);}
 function demo(){$('notes').value='Photosynthesis is the process by which green plants convert light energy into chemical energy. Chlorophyll absorbs light. Carbon dioxide and water are used to produce glucose and oxygen. The process mainly occurs in chloroplasts.';$('subject').value='Biology';$('count').value='10';$('mode').value='practice';$('createStatus').textContent='Demo material loaded — click Generate Quiz.';}
 
-function fallbackQuestions(text){
-  const subject=($('subject').value||'').trim().toLowerCase();
-  const requested=parseInt($('count').value||10,10);
-  const banks={
-    biology:[
-      {q:'Which organelle is primarily associated with photosynthesis?',a:['Mitochondrion','Chloroplast','Ribosome','Nucleus'],c:1,e:'Photosynthesis takes place mainly in chloroplasts.'},
-      {q:'What is the basic unit of life?',a:['Tissue','Organ','Cell','Atom'],c:2,e:'The cell is the basic structural and functional unit of life.'},
-      {q:'Which molecule stores genetic information?',a:['DNA','ATP','Glucose','Water'],c:0,e:'DNA stores hereditary genetic information.'},
-      {q:'Which gas is released as a product of photosynthesis?',a:['Nitrogen','Carbon dioxide','Oxygen','Hydrogen'],c:2,e:'Oxygen is released during photosynthesis.'},
-      {q:'Which structure controls many activities of a eukaryotic cell?',a:['Cell wall','Nucleus','Vacuole','Chloroplast'],c:1,e:'The nucleus contains genetic material and regulates many cellular activities.'},
-      {q:'Which blood cells are mainly responsible for carrying oxygen?',a:['Platelets','Red blood cells','White blood cells','Plasma cells'],c:1,e:'Red blood cells carry oxygen using haemoglobin.'},
-      {q:'Which molecule is the main immediate energy currency of cells?',a:['DNA','ATP','RNA','Cellulose'],c:1,e:'ATP is the main immediate energy currency used by cells.'},
-      {q:'Where does glycolysis occur?',a:['Nucleus','Cytoplasm','Chloroplast','Golgi apparatus'],c:1,e:'Glycolysis takes place in the cytoplasm.'},
-      {q:'Which organ pumps blood through the body?',a:['Liver','Heart','Lung','Kidney'],c:1,e:'The heart pumps blood through the circulatory system.'},
-      {q:'Which tissue carries electrical signals in the body?',a:['Epithelial tissue','Connective tissue','Nervous tissue','Muscle tissue'],c:2,e:'Nervous tissue specializes in transmitting electrical signals.'}
-    ],
-    chemistry:[
-      {q:'What is the atomic number of carbon?',a:['4','6','8','12'],c:1,e:'Carbon has 6 protons, so its atomic number is 6.'},
-      {q:'Which type of bond involves sharing electron pairs?',a:['Ionic','Covalent','Metallic','Hydrogen'],c:1,e:'A covalent bond forms when atoms share electron pairs.'},
-      {q:'What is the pH of a neutral solution at 25°C?',a:['0','5','7','14'],c:2,e:'At 25°C, a neutral aqueous solution has a pH of 7.'},
-      {q:'Which particle determines the atomic number of an element?',a:['Neutron','Electron','Proton','Photon'],c:2,e:'Atomic number equals the number of protons in the nucleus.'},
-      {q:'What is the main product when an acid reacts with a base?',a:['Salt and water','Oxygen only','Carbon only','Hydrogen only'],c:0,e:'An acid-base neutralization generally produces salt and water.'},
-      {q:'Which gas is commonly produced when an active metal reacts with an acid?',a:['Oxygen','Nitrogen','Hydrogen','Chlorine'],c:2,e:'Many active metals react with acids to release hydrogen gas.'},
-      {q:'Which subatomic particle has no electric charge?',a:['Proton','Electron','Neutron','Ion'],c:2,e:'A neutron has no net electric charge.'},
-      {q:'Which element has the chemical symbol Na?',a:['Nitrogen','Sodium','Neon','Nickel'],c:1,e:'Na is the chemical symbol for sodium.'},
-      {q:'What is the formula of water?',a:['CO₂','H₂O','O₂','H₂'],c:1,e:'Water consists of two hydrogen atoms and one oxygen atom: H₂O.'},
-      {q:'Which type of reaction involves gain of electrons?',a:['Oxidation','Reduction','Neutralization','Combustion'],c:1,e:'Reduction is defined as gain of electrons.'}
-    ],
-    physics:[
-      {q:'What is the SI unit of force?',a:['Joule','Watt','Newton','Pascal'],c:2,e:'Force is measured in newtons (N).'},
-      {q:'Which quantity is the rate of change of velocity?',a:['Momentum','Acceleration','Work','Power'],c:1,e:'Acceleration is the rate of change of velocity with time.'},
-      {q:'What is the SI unit of electric current?',a:['Volt','Ohm','Ampere','Coulomb'],c:2,e:'Electric current is measured in amperes (A).'},
-      {q:'Which particle has a negative electric charge?',a:['Proton','Neutron','Electron','Nucleus'],c:2,e:'The electron carries negative charge.'},
-      {q:'What is the approximate acceleration due to gravity near Earth?',a:['1.0 m/s²','4.9 m/s²','9.8 m/s²','98 m/s²'],c:2,e:'Near Earth’s surface, g is approximately 9.8 m/s².'},
-      {q:'Which wave can travel through a vacuum?',a:['Sound wave','Mechanical water wave','Light wave','Seismic wave'],c:2,e:'Electromagnetic light waves can travel through a vacuum.'},
-      {q:'What is the SI unit of energy?',a:['Newton','Joule','Pascal','Tesla'],c:1,e:'Energy is measured in joules (J).'},
-      {q:'Which quantity has both magnitude and direction?',a:['Mass','Temperature','Speed','Velocity'],c:3,e:'Velocity is a vector quantity with magnitude and direction.'},
-      {q:'What happens to current if resistance increases while voltage stays constant?',a:['It increases','It decreases','It becomes zero always','It is unchanged'],c:1,e:'By Ohm’s law, I = V/R, so current decreases when resistance increases at constant voltage.'},
-      {q:'Which instrument measures electric current?',a:['Voltmeter','Ammeter','Barometer','Thermometer'],c:1,e:'An ammeter measures electric current.'}
-    ],
-    mathematics:[
-      {q:'What is 12 × 8?',a:['86','96','108','112'],c:1,e:'12 multiplied by 8 equals 96.'},
-      {q:'What is the derivative of x²?',a:['x','2x','x²','2'],c:1,e:'Using the power rule, d(x²)/dx = 2x.'},
-      {q:'What is the value of 3² + 4²?',a:['12','16','25','49'],c:2,e:'3² + 4² = 9 + 16 = 25.'},
-      {q:'If 2x = 14, what is x?',a:['5','6','7','8'],c:2,e:'Dividing both sides by 2 gives x = 7.'},
-      {q:'What is the slope of y = 3x + 2?',a:['2','3','5','-3'],c:1,e:'In y = mx + c, m is the slope, so the slope is 3.'},
-      {q:'What is √81?',a:['7','8','9','10'],c:2,e:'9 × 9 = 81, so √81 = 9.'},
-      {q:'What is 15% of 200?',a:['15','20','30','40'],c:2,e:'0.15 × 200 = 30.'},
-      {q:'What is the value of 5²?',a:['10','15','20','25'],c:3,e:'5² = 25.'},
-      {q:'If x + 7 = 12, what is x?',a:['3','4','5','6'],c:2,e:'Subtracting 7 from both sides gives x = 5.'},
-      {q:'What is the area of a rectangle 8 units long and 3 units wide?',a:['11','18','24','32'],c:2,e:'Area = length × width = 8 × 3 = 24 square units.'}
-    ],
-    computing:[
-      {q:'What does CPU stand for?',a:['Central Processing Unit','Computer Primary Utility','Central Program User','Core Processing Utility'],c:0,e:'CPU stands for Central Processing Unit.'},
-      {q:'Which data structure follows LIFO?',a:['Queue','Stack','Array','Graph'],c:1,e:'A stack follows Last In, First Out.'},
-      {q:'What does HTML primarily define?',a:['Web page structure','Database encryption','CPU speed','Network cables'],c:0,e:'HTML defines the structure and content of web pages.'},
-      {q:'Which is an example of a programming language?',a:['Python','HTTP','HTML tag','Wi-Fi'],c:0,e:'Python is a programming language.'},
-      {q:'What is phishing?',a:['A social-engineering attack','A sorting algorithm','A storage device','A graphics format'],c:0,e:'Phishing is a social-engineering technique used to trick people into revealing information.'},
-      {q:'What does AI commonly refer to?',a:['Artificial Intelligence','Automated Internet','Applied Input','Advanced Interface'],c:0,e:'AI stands for Artificial Intelligence.'},
-      {q:'What does RAM provide?',a:['Temporary working memory','Permanent optical storage','Internet access','Power conversion'],c:0,e:'RAM provides temporary working memory for active programs and data.'},
-      {q:'Which protocol is commonly used to load web pages securely?',a:['HTTPS','FTP','SMTP','SSH only'],c:0,e:'HTTPS is the secure HTTP protocol commonly used for web pages.'},
-      {q:'What is an algorithm?',a:['A step-by-step procedure','A computer monitor','A file extension','A type of battery'],c:0,e:'An algorithm is a defined sequence of steps for solving a problem or performing a task.'},
-      {q:'Which is a common database language?',a:['SQL','CSS','JPEG','PNG'],c:0,e:'SQL is widely used to query and manage relational databases.'}
-    ]
-  };
-  let key=Object.keys(banks).find(k=>subject.includes(k));
-  if(!key){if(subject.includes('bio'))key='biology';else if(subject.includes('chem'))key='chemistry';else if(subject.includes('phys'))key='physics';else if(subject.includes('math'))key='mathematics';else if(subject.includes('cyber')||subject.includes('ai')||subject.includes('computer'))key='computing';}
-  if(!key)return [{q:'Which subject did you select?',a:[subject,'Biology','Chemistry','Physics'],c:0,e:'The offline prototype does not yet have a built-in bank for this subject. Connect the AI backend to generate questions from arbitrary material.'}];
-  // The local fallback always returns exactly the requested number. It cycles through the built-in bank when more questions are requested.
-  const bank=banks[key];
-  return Array.from({length:requested},(_,i)=>{
-    const base=bank[i%bank.length];
-    return {...base,q:(i<bank.length?base.q:base.q+' (practice question '+(i+1)+')')};
-  });
-}
-
 function generateQuiz(){
   const text=$('notes').value.trim(), photo=$('photo').files[0];
   if(!text&&!photo){$('createStatus').textContent='Add a photo or enter some notes first.';return;}
@@ -376,8 +300,20 @@ function startTimer(){
   },1000);
 }
 function autoFinishTimed(){
-  userAnswers.forEach(s=>{if(!s.answered)s.timedOut=true;});
-  finishQuiz(true);
+  if(!quizStarted || quizFinished)return;
+
+  clearInterval(timerInterval);
+  timerInterval=null;
+
+  currentQuiz.forEach((q,i)=>{
+    if(userAnswers[i]===undefined){
+      userAnswers[i]=null;
+    }
+  });
+
+  quizFinished=true;
+  showReview();
+}
 }
 function renderQuestion(){
   const q=currentQuiz[currentIndex], state=userAnswers[currentIndex]||{selected:null,answered:false,timedOut:false};
@@ -755,14 +691,23 @@ function getDifficultyQuestions(subject,difficulty,count){
 
   let pool;
 
-  if(d==='easy'){
-    pool=[...bank.easy];
-  }else if(d==='medium'){
-    pool=[...bank.medium];
-  }else if(d==='hard'){
-    pool=[...bank.hard];
-  }else{
-    pool=[...bank.easy,...bank.medium,...bank.hard];
+if(d==='easy'){
+  pool=[...bank.easy];
+}else if(d==='medium'){
+  pool=[...bank.medium];
+}else if(d==='hard'){
+  pool=[...bank.hard];
+}else{
+  pool=[...bank.easy,...bank.medium,...bank.hard];
+}
+
+// Repeat questions when the selected count is larger than the available bank.
+if(pool.length < requested){
+  const original=[...pool];
+  while(pool.length < requested){
+    pool.push(...original);
+  }
+  pool=pool.slice(0,requested);
   }
 
   for(let i=pool.length-1;i>0;i--){
@@ -771,24 +716,40 @@ function getDifficultyQuestions(subject,difficulty,count){
   }
 
   const unique=[];
-  const seen=new Set();
+const seen=new Set();
 
-  for(const item of pool){
-    const key=item.q.trim().toLowerCase();
+for(const item of pool){
+  const key=item.q.trim().toLowerCase();
 
-    if(!seen.has(key)){
-      seen.add(key);
+  if(!seen.has(key)){
+    seen.add(key);
 
-      unique.push({
-        q:item.q,
-        a:[...item.a],
-        c:item.c,
-        e:item.e
-      });
-    }
+    unique.push({
+      q:item.q,
+      a:[...item.a],
+      c:item.c,
+      e:item.e
+    });
   }
+}
 
-  return unique.slice(0,requested);
+if(unique.length < requested){
+  const original=[...unique];
+  let i=0;
+
+  while(unique.length < requested){
+    const base=original[i % original.length];
+
+    unique.push({
+      ...base,
+      q:base.q + ' (Practice ' + (unique.length + 1) + ')'
+    });
+
+    i++;
+  }
+}
+
+return unique.slice(0,requested);
                       }
 
 </script>
