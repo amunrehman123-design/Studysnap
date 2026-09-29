@@ -420,106 +420,324 @@ function closeHomeMenu(){
 
 window.addEventListener("load",()=>setTimeout(hideSplash,2200));
 function getDifficultyQuestions(subject,difficulty,count){
-  const s=(subject||'').toLowerCase();
-  const d=(difficulty||'mixed').toLowerCase();
+  const s=(subject||'').toLowerCase().trim();
+  const d=(difficulty||'mixed').toLowerCase().trim();
+  const requested=Math.max(1,parseInt(count,10)||10);
+
+  const make=(q,a,c,e)=>({q,a,c,e});
 
   const banks={
-    biology:[
-      ['Which organelle is primarily associated with photosynthesis?',['Mitochondrion','Chloroplast','Ribosome','Nucleus'],1,'Photosynthesis mainly occurs in chloroplasts.'],
-      ['What is the basic unit of life?',['Tissue','Organ','Cell','Atom'],2,'The cell is the basic structural and functional unit of life.'],
-      ['Which molecule stores genetic information?',['DNA','ATP','Glucose','Water'],0,'DNA stores hereditary genetic information.'],
-      ['Which gas is released during photosynthesis?',['Nitrogen','Carbon dioxide','Oxygen','Hydrogen'],2,'Oxygen is released during photosynthesis.'],
-      ['Which organ pumps blood through the body?',['Liver','Heart','Lung','Kidney'],1,'The heart pumps blood through the circulatory system.'],
-      ['Where does glycolysis occur?',['Nucleus','Cytoplasm','Chloroplast','Golgi apparatus'],1,'Glycolysis occurs in the cytoplasm.'],
-      ['Which blood cells mainly carry oxygen?',['Platelets','Red blood cells','White blood cells','Plasma'],1,'Red blood cells carry oxygen using haemoglobin.'],
-      ['Which molecule is the immediate energy currency of cells?',['DNA','ATP','RNA','Cellulose'],1,'ATP is the main immediate energy currency of cells.'],
-      ['How many chambers does the human heart have?',['2','3','4','5'],2,'The human heart has four chambers.'],
-      ['Which tissue transmits electrical signals?',['Epithelial','Connective','Nervous','Muscle'],2,'Nervous tissue specializes in transmitting signals.']
-    ],
-    chemistry:[
-      ['What is the atomic number of carbon?',['4','6','8','12'],1,'Carbon has six protons.'],
-      ['Which bond involves sharing electron pairs?',['Ionic','Covalent','Metallic','Nuclear'],1,'Covalent bonds involve shared electron pairs.'],
-      ['What is the pH of a neutral solution at 25°C?',['0','5','7','14'],2,'A neutral aqueous solution has pH 7 at 25°C.'],
-      ['Which particle determines atomic number?',['Neutron','Electron','Proton','Photon'],2,'Atomic number equals the number of protons.'],
-      ['What is the formula of water?',['CO2','H2O','O2','H2'],1,'Water is H2O.'],
-      ['Which particle has no electric charge?',['Proton','Electron','Neutron','Ion'],2,'A neutron has no net electric charge.'],
-      ['Which element has the symbol Na?',['Nitrogen','Sodium','Neon','Nickel'],1,'Na is the symbol for sodium.'],
-      ['Which process involves gain of electrons?',['Oxidation','Reduction','Neutralization','Combustion'],1,'Reduction is gain of electrons.'],
-      ['A solution with pH below 7 is generally:',['Acidic','Basic','Neutral','Metallic'],0,'A pH below 7 is acidic.'],
-      ['Which gas is commonly released when an active metal reacts with an acid?',['Oxygen','Nitrogen','Hydrogen','Chlorine'],2,'Many active metals release hydrogen gas with acids.']
-    ],
-    physics:[
-      ['What is the SI unit of force?',['Joule','Watt','Newton','Pascal'],2,'Force is measured in newtons.'],
-      ['What is the SI unit of energy?',['Newton','Joule','Pascal','Tesla'],1,'Energy is measured in joules.'],
-      ['Which instrument measures electric current?',['Voltmeter','Ammeter','Barometer','Thermometer'],1,'An ammeter measures current.'],
-      ['Which particle has a negative charge?',['Proton','Neutron','Electron','Nucleus'],2,'Electrons have negative charge.'],
-      ['What is the approximate acceleration due to gravity?',['1.0 m/s²','4.9 m/s²','9.8 m/s²','98 m/s²'],2,'Near Earth, g is approximately 9.8 m/s².'],
-      ['Which quantity has magnitude and direction?',['Mass','Temperature','Speed','Velocity'],3,'Velocity is a vector quantity.'],
-      ['What is the approximate speed of light in vacuum?',['3×10⁸ m/s','3×10⁶ m/s','3×10⁴ m/s','3×10² m/s'],0,'Light travels at approximately 3×10⁸ m/s in vacuum.'],
-      ['What happens to current if resistance increases at constant voltage?',['It increases','It decreases','It doubles','It stays the same'],1,'From I=V/R, current decreases when resistance increases.'],
-      ['What type of energy does a moving object have?',['Potential','Kinetic','Chemical','Nuclear'],1,'Moving objects possess kinetic energy.'],
-      ['What is the SI unit of resistance?',['Volt','Ampere','Ohm','Watt'],2,'Resistance is measured in ohms.']
-    ],
-    mathematics:[
-      ['What is 12 × 8?',['86','96','108','112'],1,'12 × 8 = 96.'],
-      ['What is √81?',['7','8','9','10'],2,'9 × 9 = 81.'],
-      ['What is 15% of 200?',['15','20','30','40'],2,'0.15 × 200 = 30.'],
-      ['If x + 7 = 12, what is x?',['3','4','5','6'],2,'Subtract 7 from both sides: x = 5.'],
-      ['What is 2³?',['6','8','9','12'],1,'2³ = 8.'],
-      ['What is 5²?',['10','15','20','25'],3,'5² = 25.'],
-      ['What is 1/2 + 1/4?',['1/4','1/2','3/4','1'],2,'1/2 + 1/4 = 3/4.'],
-      ['How many degrees are in a right angle?',['45°','90°','180°','360°'],1,'A right angle measures 90°.'],
-      ['What is the perimeter of a square with side 5 cm?',['10 cm','15 cm','20 cm','25 cm'],2,'Perimeter = 4 × 5 = 20 cm.'],
-      ['What is 100 ÷ 4?',['20','25','30','40'],1,'100 ÷ 4 = 25.']
-    ],
-    cybersecurity:[
-      ['What is phishing?',['A deceptive attempt to obtain information','A storage device','A programming language','A backup method'],0,'Phishing uses deception to obtain information.'],
-      ['What does MFA stand for?',['Multi-Factor Authentication','Main Firewall Access','Managed File Area','Multiple Folder Access'],0,'MFA uses multiple verification factors.'],
-      ['What does a firewall primarily do?',['Filter network traffic','Charge batteries','Edit photos','Increase brightness'],0,'Firewalls monitor and filter network traffic.'],
-      ['What is malware?',['Malicious software','A monitor','A password','A browser'],0,'Malware is software designed to cause harm or unwanted actions.'],
-      ['What is encryption used for?',['Protecting information','Increasing brightness','Cooling computers','Deleting hardware'],0,'Encryption transforms information into an encoded form.'],
-      ['What should you do with a suspicious link?',['Open it','Share it','Avoid clicking it','Download it'],2,'Suspicious links should be avoided.'],
-      ['What is a security patch?',['A security-fixing software update','A cable','A screen protector','A password'],0,'Security patches fix known security problems.'],
-      ['What does antivirus software detect?',['Malware','Printers','Keyboards','Monitors'],0,'Antivirus software can detect malicious software.'],
-      ['What does VPN stand for?',['Virtual Private Network','Verified Public Network','Visual Protected Node','Virtual Personal Number'],0,'VPN stands for Virtual Private Network.'],
-      ['What can a strong unique password help prevent?',['Typing errors','Unauthorized access','Slow internet','Screen damage'],1,'Strong unique passwords help protect accounts from unauthorized access.']
-    ],
-    artificialintelligence:[
-      ['What does AI stand for?',['Artificial Intelligence','Automated Internet','Advanced Input','Artificial Internet'],0,'AI stands for Artificial Intelligence.'],
-      ['What is machine learning?',['Learning patterns from data','Hardware repair','Password creation','A keyboard'],0,'Machine learning uses data to learn patterns.'],
-      ['What is a dataset?',['A collection of data','A cable','A password','A processor'],0,'A dataset is a collection of data.'],
-      ['What is a chatbot?',['A program that converses with users','A battery','A monitor','A cable'],0,'A chatbot is software designed to interact through conversation.'],
-      ['What is computer vision?',['AI understanding images or video','Computer repair','Fast typing','Network security'],0,'Computer vision enables computers to process visual information.'],
-      ['What is training data?',['Data used to train a model','Deleted files','A password','A graphics card'],0,'Training data is used to train a machine-learning model.'],
-      ['What is an algorithm?',['A step-by-step procedure','A screen','A virus','A battery'],0,'An algorithm is a defined sequence of steps.'],
-      ['What is an AI model?',['A system trained to perform tasks from data','A keyboard','A cable','A browser'],0,'An AI model learns patterns from data to perform tasks.'],
-      ['What is NLP?',['Natural Language Processing','Network Login Protocol','New Learning Program','Numeric Logic Process'],0,'NLP stands for Natural Language Processing.'],
-      ['What is automation?',['Using technology to perform tasks automatically','Turning off a computer','Typing passwords','Installing a monitor'],0,'Automation uses technology to perform tasks with reduced manual input.']
-    ],
-    computing:[
-      ['What does CPU stand for?',['Central Processing Unit','Computer Personal Unit','Central Program Utility','Control Processing User'],0,'CPU stands for Central Processing Unit.'],
-      ['What does RAM provide?',['Temporary working memory','Paper storage','Internet access','Power generation'],0,'RAM provides temporary working memory.'],
-      ['What is an operating system?',['Software that manages computer resources','A keyboard','A cable','A printer'],0,'An operating system manages hardware and software resources.'],
-      ['What is HTML used for?',['Structuring web pages','Editing photos','Charging phones','Scanning viruses'],0,'HTML defines the structure of web pages.'],
-      ['What is a database?',['An organized collection of data','A monitor','A battery','A keyboard'],0,'A database stores organized data.'],
-      ['What is software?',['Programs and instructions','Physical components','Electricity','A desk'],0,'Software consists of programs and instructions.'],
-      ['What is hardware?',['Physical computer components','Web pages','Passwords','Programs'],0,'Hardware refers to physical components.'],
-      ['What is a browser used for?',['Accessing websites','Cooling a CPU','Charging a laptop','Printing money'],0,'A browser is used to access web content.'],
-      ['What is a programming language?',['A language used to write programs','A hardware component','A cable','A monitor'],0,'Programming languages are used to create software.'],
-      ['What is SQL commonly used for?',['Working with databases','Styling web pages','Editing images','Playing audio'],0,'SQL is commonly used to query and manage databases.']
-    ],
-    english:[
-      ['Choose the correct spelling:',['Recieve','Receive','Receeve','Receve'],1,'Receive is the correct spelling.'],
-      ['What is the opposite of hot?',['Warm','Cold','Heat','Fire'],1,'Cold is the opposite of hot.'],
-      ['Which is a noun?',['Run','Beautiful','Teacher','Quickly'],2,'Teacher is a noun.'],
-      ['Choose the correct article: ___ apple.',['A','An','The','No article'],1,'An is used before the vowel sound in apple.'],
-      ['What is the past tense of go?',['Goed','Gone','Went','Going'],2,'The past tense of go is went.'],
-      ['Which word means happy?',['Sad','Joyful','Angry','Tired'],1,'Joyful means happy.'],
-      ['Which sentence is correct?',['She are happy.','She is happy.','She am happy.','She be happy.'],1,'She is happy is grammatically correct.'],
-      ['What is the plural of child?',['Childs','Childes','Children','Childrens'],2,'The plural of child is children.'],
-      ['Which word is an adjective?',['Quickly','Beauty','Beautiful','Run'],2,'Beautiful is an adjective.'],
-      ['What punctuation ends a question?',['.','!',',','?'],3,'A question normally ends with a question mark.']
-    ]
+    biology:{
+      easy:[
+        make('What is the basic unit of life?',['Tissue','Cell','Organ','Atom'],1,'The cell is the basic structural and functional unit of life.'),
+        make('Which organ pumps blood through the body?',['Liver','Kidney','Heart','Lung'],2,'The heart pumps blood through the circulatory system.'),
+        make('Which molecule stores genetic information?',['ATP','DNA','Glucose','Water'],1,'DNA stores hereditary genetic information.'),
+        make('How many chambers does the human heart have?',['2','3','4','5'],2,'The human heart has four chambers.'),
+        make('Which blood cells mainly carry oxygen?',['Platelets','White blood cells','Red blood cells','Plasma'],2,'Red blood cells carry oxygen using haemoglobin.'),
+        make('Which gas is released during photosynthesis?',['Nitrogen','Oxygen','Hydrogen','Carbon dioxide'],1,'Oxygen is released during photosynthesis.'),
+        make('Which organ is mainly responsible for filtering blood and producing urine?',['Heart','Kidney','Lung','Stomach'],1,'The kidneys filter blood and form urine.'),
+        make('Which organ is primarily responsible for gas exchange?',['Lung','Liver','Pancreas','Spleen'],0,'Gas exchange occurs mainly in the lungs.'),
+        make('Which structure contains the genetic material of a typical human cell?',['Nucleus','Ribosome','Cell wall','Vacuole'],0,'The nucleus contains most of the genetic material in a human cell.'),
+        make('Which substance is released by plants during photosynthesis?',['Oxygen','Nitrogen','Urea','Ammonia'],0,'Oxygen is released during photosynthesis.')
+      ],
+      medium:[
+        make('Where does glycolysis occur?',['Nucleus','Cytoplasm','Mitochondrial matrix','Golgi apparatus'],1,'Glycolysis occurs in the cytoplasm.'),
+        make('Which organelle is primarily associated with photosynthesis?',['Mitochondrion','Ribosome','Chloroplast','Nucleus'],2,'Photosynthesis mainly occurs in chloroplasts.'),
+        make('What is the immediate energy currency of most cells?',['DNA','ATP','RNA','Cellulose'],1,'ATP is the main immediate energy currency of cells.'),
+        make('Which structure controls movement of substances into and out of a cell?',['Cell wall','Cell membrane','Nucleolus','Centrosome'],1,'The cell membrane regulates movement of substances into and out of the cell.'),
+        make('Which part of the nephron is mainly responsible for ultrafiltration?',['Loop of Henle','Collecting duct','Glomerulus','Distal tubule'],2,'Ultrafiltration occurs at the glomerulus.'),
+        make('Which molecule carries genetic instructions from DNA to a ribosome?',['mRNA','ATP','Glucose','Lipid'],0,'Messenger RNA carries genetic instructions from DNA to ribosomes.'),
+        make('Which blood component is mainly involved in clotting?',['Red blood cells','Platelets','Plasma glucose','Neurons'],1,'Platelets play a major role in blood clotting.'),
+        make('Which structure connects a muscle to a bone?',['Ligament','Tendon','Cartilage','Neuron'],1,'Tendons connect muscles to bones.'),
+        make('Which type of cell division produces two genetically similar daughter cells?',['Meiosis','Mitosis','Fertilization','Mutation'],1,'Mitosis generally produces two genetically similar daughter cells.'),
+        make('Which pigment absorbs light energy for photosynthesis?',['Haemoglobin','Chlorophyll','Melanin','Keratin'],1,'Chlorophyll absorbs light energy used in photosynthesis.')
+      ],
+      hard:[
+        make('During which stage of mitosis do sister chromatids separate?',['Prophase','Metaphase','Anaphase','Telophase'],2,'Sister chromatids separate during anaphase.'),
+        make('Which process produces new combinations of alleles during meiosis?',['DNA replication','Crossing over','Transcription','Translation'],1,'Crossing over exchanges genetic material between homologous chromosomes.'),
+        make('Which molecule carries amino acids to the ribosome during protein synthesis?',['mRNA','tRNA','rRNA','DNA'],1,'tRNA carries amino acids to the ribosome.'),
+        make('What is the main role of the sodium-potassium pump?',['Produce glucose','Move ions using ATP','Replicate DNA','Digest proteins'],1,'The sodium-potassium pump uses ATP for active transport.'),
+        make('Which phase of the cell cycle involves DNA replication?',['G1','S','G2','M'],1,'DNA replication occurs during the S phase.'),
+        make('Which enzyme joins Okazaki fragments?',['Helicase','DNA ligase','RNA polymerase','Amylase'],1,'DNA ligase joins Okazaki fragments on the lagging strand.'),
+        make('Which process converts mRNA information into a polypeptide?',['Replication','Transcription','Translation','Diffusion'],2,'Translation uses mRNA information to build a polypeptide.'),
+        make('Which inheritance pattern occurs when both alleles are fully expressed in a heterozygote?',['Incomplete dominance','Codominance','Recessiveness','Polygenic inheritance'],1,'Codominance means both alleles are expressed.'),
+        make('Which molecule acts as the main hereditary material in most living organisms?',['ATP','DNA','Glucose','Cholesterol'],1,'DNA is the main hereditary material in most organisms.'),
+        make('What is the main function of antibodies?',['Carry oxygen','Defend against specific foreign substances','Digest carbohydrates','Produce ATP'],1,'Antibodies participate in specific immune defense.')
+      ]
+    },
+
+    chemistry:{
+      easy:[
+        make('What is the chemical symbol for sodium?',['So','S','Na','Sn'],2,'Sodium has the symbol Na.'),
+        make('What is the pH of a neutral solution at 25°C?',['0','7','10','14'],1,'A neutral solution has a pH of 7 at 25°C.'),
+        make('Which particle has a negative charge?',['Proton','Neutron','Electron','Nucleus'],2,'An electron has a negative charge.'),
+        make('What is the formula of water?',['CO₂','H₂O','O₂','H₂'],1,'Water is H₂O.'),
+        make('Which gas is required for ordinary combustion?',['Nitrogen','Oxygen','Hydrogen','Helium'],1,'Oxygen supports ordinary combustion.'),
+        make('What is the atomic number of hydrogen?',['0','1','2','8'],1,'Hydrogen has one proton, so its atomic number is 1.'),
+        make('Which element has the symbol O?',['Gold','Oxygen','Osmium','Iron'],1,'O is the symbol for oxygen.'),
+        make('Which state of matter has a fixed volume but no fixed shape?',['Solid','Liquid','Gas','Plasma'],1,'A liquid has a fixed volume but takes the shape of its container.'),
+        make('What is NaCl commonly called?',['Sodium chloride','Sodium carbonate','Calcium chloride','Potassium chloride'],0,'NaCl is sodium chloride.'),
+        make('Which subatomic particle has no electric charge?',['Electron','Proton','Neutron','Ion'],2,'A neutron has no net electric charge.')
+      ],
+      medium:[
+        make('Which type of bond forms by sharing electron pairs?',['Ionic','Metallic','Covalent','Hydrogen'],2,'Covalent bonds involve sharing electron pairs.'),
+        make('What generally happens to atomic radius across a period from left to right?',['It increases','It decreases','It stays exactly constant','It becomes zero'],1,'Atomic radius generally decreases across a period.'),
+        make('Which reagent is used in the Tollens test for aldehydes?',['Ammoniacal silver nitrate','Concentrated HCl','Sodium chloride','Copper metal'],0,'Tollens reagent is ammoniacal silver nitrate.'),
+        make('What is the usual oxidation number of oxygen in most compounds?',['+2','+1','−1','−2'],3,'Oxygen normally has oxidation number −2.'),
+        make('Which gas law relates pressure and volume at constant temperature?',['Boyle’s law','Charles’s law','Avogadro’s law','Graham’s law'],0,'Boyle’s law relates pressure and volume at constant temperature.'),
+        make('Which particle determines the identity of an element?',['Electron','Neutron','Proton','Photon'],2,'The number of protons determines the atomic number and identity of an element.'),
+        make('Which type of reaction involves transfer of electrons?',['Redox','Neutralization','Precipitation','Hydration'],0,'Redox reactions involve oxidation and reduction, which involve electron transfer.'),
+        make('What happens to a catalyst during a reaction?',['It is permanently consumed','It provides an alternative pathway','It becomes the main product','It changes the equilibrium constant'],1,'A catalyst provides an alternative reaction pathway and is regenerated.'),
+        make('Which intermolecular force is especially important between water molecules?',['Hydrogen bonding','Metallic bonding','Ionic bonding','Nuclear bonding'],0,'Water molecules form hydrogen bonds with each other.'),
+        make('What is molarity a measure of?',['Moles per litre of solution','Grams per kilogram only','Atoms per solid','Pressure per molecule'],0,'Molarity is moles of solute per litre of solution.')
+      ],
+      hard:[
+        make('Which reaction mechanism involves a carbocation intermediate?',['SN2','SN1','E2','Addition of H₂'],1,'SN1 reactions proceed through a carbocation intermediate.'),
+        make('Which factor generally increases reaction rate?',['Lower temperature','Lower concentration','Higher temperature','Removing reactants'],2,'Higher temperature generally increases effective collisions.'),
+        make('Which process represents removal of an electron from a gaseous atom?',['Electron affinity','Ionization','Hydration','Condensation'],1,'Ionization involves removing an electron from an atom.'),
+        make('What is the main effect of a catalyst on activation energy?',['It increases it','It lowers it','It makes it infinite','It removes all reactants'],1,'A catalyst lowers the activation energy of an alternative pathway.'),
+        make('Which quantum number describes the shape of an orbital?',['Principal quantum number','Azimuthal quantum number','Magnetic quantum number','Spin quantum number'],1,'The azimuthal quantum number determines orbital subshell shape.'),
+        make('Which species acts as the oxidizing agent in a redox reaction?',['The species that is oxidized','The species that is reduced','The catalyst only','The solvent only'],1,'The oxidizing agent accepts electrons and is itself reduced.'),
+        make('What does Le Chatelier’s principle describe?',['Response of equilibrium to a disturbance','Electron spin only','Nuclear decay only','Atomic mass calculation'],0,'An equilibrium system shifts in response to a disturbance.'),
+        make('Which hybridization is associated with a linear carbon atom in acetylene?',['sp','sp²','sp³','dsp²'],0,'The carbon atoms in acetylene are sp hybridized.'),
+        make('Which condition favors formation of an SN2 product?',['A highly hindered substrate','A strong nucleophile and less hindered substrate','A stable carbocation only','Very weak nucleophile only'],1,'SN2 reactions are favored by less hindered substrates and suitable strong nucleophiles.'),
+        make('What does Hess’s law state?',['Enthalpy change depends only on initial and final states','Pressure is always constant','All reactions require catalysts','Entropy is always zero'],0,'Hess’s law follows from enthalpy being a state function.')
+      ]
+    },
+
+    physics:{
+      easy:[
+        make('What is the SI unit of force?',['Joule','Watt','Newton','Pascal'],2,'Force is measured in newtons.'),
+        make('What is the SI unit of electric current?',['Volt','Ampere','Ohm','Coulomb'],1,'Electric current is measured in amperes.'),
+        make('Which quantity is measured in metres?',['Time','Mass','Length','Current'],2,'The metre is the SI unit of length.'),
+        make('What is the approximate acceleration due to gravity near Earth?',['2.8 m/s²','5.0 m/s²','9.8 m/s²','19.6 m/s²'],2,'Near Earth, g is approximately 9.8 m/s².'),
+        make('What is the SI unit of energy?',['Newton','Joule','Pascal','Tesla'],1,'Energy is measured in joules.'),
+        make('Which quantity is measured in kilograms?',['Mass','Force','Energy','Power'],0,'The kilogram is the SI unit of mass.'),
+        make('What is speed?',['Distance divided by time','Mass divided by volume','Force divided by area','Energy divided by charge'],0,'Speed is distance travelled per unit time.'),
+        make('Which device measures electric current?',['Voltmeter','Ammeter','Barometer','Thermometer'],1,'An ammeter measures electric current.'),
+        make('Which quantity has both magnitude and direction?',['Scalar','Vector','Mass only','Temperature only'],1,'A vector has magnitude and direction.'),
+        make('What is the SI unit of power?',['Joule','Watt','Newton','Coulomb'],1,'Power is measured in watts.')
+      ],
+      medium:[
+        make('What happens to current through a fixed resistor if voltage is doubled?',['It halves','It doubles','It becomes zero','It remains unchanged'],1,'For fixed resistance, Ohm’s law gives current proportional to voltage.'),
+        make('Which quantity is the product of mass and velocity?',['Force','Energy','Momentum','Power'],2,'Momentum equals mass multiplied by velocity.'),
+        make('Which phenomenon explains bending of light entering another medium?',['Reflection','Refraction','Diffraction','Polarization'],1,'Refraction is the change in direction as light enters another medium.'),
+        make('Which component in a transformer carries the alternating current that creates the changing magnetic field?',['Primary coil','Fuse','Battery case','Switch'],0,'Alternating current in the primary coil creates the changing magnetic field.'),
+        make('What happens to resistance of a metallic conductor as temperature increases?',['It generally increases','It always becomes zero','It generally decreases to zero','It never changes'],0,'The resistance of a typical metal generally increases with temperature.'),
+        make('Which law relates current, voltage and resistance?',['Ohm’s law','Newton’s law','Snell’s law','Hooke’s law'],0,'Ohm’s law relates voltage, current and resistance.'),
+        make('What is the work done when force is perpendicular to displacement?',['Maximum','Zero','Negative infinity','Equal to mass'],1,'Work is zero when force is perpendicular to displacement.'),
+        make('Which lens is thicker at the centre than at the edges?',['Concave','Convex','Plane mirror','Cylindrical lens'],1,'A convex lens is thicker at the centre.'),
+        make('Which wave requires a material medium?',['Light','Radio wave','Sound','X-ray'],2,'Sound is a mechanical wave and requires a medium.'),
+        make('What does frequency measure?',['Cycles per unit time','Distance per unit mass','Force per area','Energy per charge'],0,'Frequency is the number of cycles per unit time.')
+      ],
+      hard:[
+        make('If the secondary voltage is greater than the primary voltage, the transformer is a:',['Step-down transformer','Step-up transformer','DC transformer','Rectifier'],1,'A step-up transformer increases secondary voltage.'),
+        make('What happens to the wavelength of light entering a denser medium from air?',['It increases','It decreases','It becomes zero','It remains unchanged'],1,'Speed and wavelength decrease while frequency remains constant.'),
+        make('Which quantity remains unchanged when light crosses a boundary between transparent media?',['Speed','Wavelength','Frequency','Intensity always'],2,'Frequency remains unchanged at the boundary.'),
+        make('For uniform circular motion at constant speed, velocity is:',['Constant in magnitude and direction','Changing because direction changes','Always zero','Increasing continuously'],1,'Velocity changes continuously because its direction changes.'),
+        make('What is the condition for resonance?',['Driving frequency matches natural frequency','Driving frequency is always zero','Amplitude must be zero','Mass must disappear'],0,'Resonance occurs when the driving frequency matches the natural frequency.'),
+        make('Which equation represents the de Broglie wavelength?',['λ=h/p','λ=p/h','λ=mc²','λ=hf'],0,'The de Broglie relation is λ = h/p.'),
+        make('In an AC circuit containing only an ideal inductor, current:',['Is in phase with voltage','Lags voltage by 90°','Leads voltage by 90°','Is always zero'],1,'In an ideal inductive circuit, current lags voltage by 90°.'),
+        make('What does the area under a force-displacement graph represent?',['Power','Work','Momentum','Frequency'],1,'The area under a force-displacement graph represents work.'),
+        make('Which phenomenon supports the wave nature of light?',['Interference','Photoelectric effect only','Compton scattering only','Mass-energy equivalence'],0,'Interference is a characteristic wave phenomenon.'),
+        make('What happens to kinetic energy if the speed of an object doubles?',['It doubles','It becomes four times larger','It halves','It remains unchanged'],1,'Kinetic energy is proportional to the square of speed.')
+      ]
+    },
+
+    mathematics:{
+      easy:[
+        make('What is 7 × 8?',['54','56','64','48'],1,'7 × 8 = 56.'),
+        make('What is √81?',['7','8','9','10'],2,'The principal square root of 81 is 9.'),
+        make('What is 25% of 100?',['10','20','25','50'],2,'25% of 100 is 25.'),
+        make('If x + 5 = 12, what is x?',['5','6','7','8'],2,'Subtracting 5 gives x = 7.'),
+        make('What is 3²?',['6','9','12','3'],1,'3² = 9.'),
+        make('What is 15 + 27?',['32','40','42','45'],2,'15 + 27 = 42.'),
+        make('What is 100 ÷ 4?',['20','25','40','50'],1,'100 ÷ 4 = 25.'),
+        make('What is the next number: 2, 4, 6, 8, ?',['9','10','11','12'],1,'The sequence increases by 2, so the next number is 10.'),
+        make('What is 5² − 3²?',['8','16','22','34'],1,'25 − 9 = 16.'),
+        make('If y = 2x and x = 4, what is y?',['4','6','8','10'],2,'Substituting x = 4 gives y = 8.')
+      ],
+      medium:[
+        make('If 2x + 6 = 14, what is x?',['2','3','4','5'],2,'Subtract 6 and divide by 2: x = 4.'),
+        make('What is the slope of y = 3x + 2?',['2','3','−3','1/3'],1,'In y = mx + c, m is the slope.'),
+        make('What is the derivative of x²?',['x','2x','x²','2'],1,'The derivative of x² is 2x.'),
+        make('What is the probability of heads on a fair coin toss?',['0','1/4','1/2','1'],2,'There are two equally likely outcomes, so the probability is 1/2.'),
+        make('Solve 3x − 5 = 10.',['3','4','5','6'],2,'Adding 5 and dividing by 3 gives x = 5.'),
+        make('What is the gradient between (0,0) and (2,6)?',['2','3','4','6'],1,'Gradient = change in y/change in x = 6/2 = 3.'),
+        make('What is 2³ × 2²?',['16','32','64','8'],1,'For the same base, add exponents: 2⁵ = 32.'),
+        make('What is the mean of 4, 6 and 8?',['5','6','7','8'],1,'The mean is (4+6+8)/3 = 6.'),
+        make('If a triangle has base 10 and height 6, what is its area?',['16','30','60','80'],1,'Area = 1/2 × 10 × 6 = 30.'),
+        make('What is the value of 2x when x = −3?',['−6','−1','3','6'],0,'2 × (−3) = −6.')
+      ],
+      hard:[
+        make('What is the derivative of sin x?',['cos x','−cos x','sin x','−sin x'],0,'The derivative of sin x is cos x.'),
+        make('If f(x)=x²−4x, what is f′(x)?',['2x−4','x−4','2x+4','x²−4'],0,'Differentiating gives 2x − 4.'),
+        make('What is ∫2x dx?',['x²+C','2x²+C','x+C','2+C'],0,'The antiderivative of 2x is x² + C.'),
+        make('If a quadratic has discriminant zero, how many distinct real roots does it have?',['0','1','2','3'],1,'A zero discriminant gives one distinct real root.'),
+        make('What is the derivative of ln x?',['x','1/x','ln x','eˣ'],1,'The derivative of ln x is 1/x for x > 0.'),
+        make('What is ∫cos x dx?',['sin x+C','−sin x+C','cos x+C','x cos x+C'],0,'The antiderivative of cos x is sin x + C.'),
+        make('If det(A)=0 for a square matrix A, what does this imply?',['A is singular','A is always identity','A has determinant 1','A must be diagonal'],0,'A square matrix with determinant zero is singular.'),
+        make('What is the limit of 1/x as x approaches infinity?',['1','0','∞','−1'],1,'As x grows without bound, 1/x approaches zero.'),
+        make('If log₁₀x = 2, what is x?',['10','20','100','1000'],2,'10² = 100.'),
+        make('What is the derivative of eˣ?',['x eˣ','eˣ','ln x','1/x'],1,'The derivative of eˣ is eˣ.')
+      ]
+    },
+
+    computing:{
+      easy:[
+        make('What does CPU stand for?',['Central Processing Unit','Computer Personal Unit','Central Program Utility','Core Processing User'],0,'CPU stands for Central Processing Unit.'),
+        make('Which device is commonly used to enter text?',['Monitor','Keyboard','Speaker','Projector'],1,'A keyboard is an input device.'),
+        make('What does RAM provide?',['Temporary working memory','Permanent paper storage','Internet access','Electric power'],0,'RAM provides temporary working memory.'),
+        make('Which is an operating system?',['Windows','HTML','Python','JPEG'],0,'Windows is an operating system.'),
+        make('Which device displays visual output?',['Keyboard','Monitor','Microphone','Scanner'],1,'A monitor displays visual output.'),
+        make('What does USB commonly refer to?',['Universal Serial Bus','Unified Storage Board','User System Backup','Universal Software Block'],0,'USB stands for Universal Serial Bus.'),
+        make('Which is a programming language?',['Python','JPEG','HDMI','USB'],0,'Python is a programming language.'),
+        make('Which unit commonly measures digital storage?',['Byte','Newton','Volt','Pascal'],0,'Digital storage is commonly measured in bytes and related units.'),
+        make('What is software?',['Programs and instructions','Only computer cables','A physical monitor','Electrical current'],0,'Software consists of programs and instructions.'),
+        make('Which component performs many arithmetic and logical operations?',['CPU','Speaker','Keyboard','Monitor'],0,'The CPU performs processing operations.')
+      ],
+      medium:[
+        make('What does an algorithm provide?',['A step-by-step method for solving a problem','Only computer hardware','A type of monitor','A storage cable'],0,'An algorithm is a sequence of steps for solving a problem.'),
+        make('Which data structure follows FIFO order?',['Stack','Queue','Tree','Graph'],1,'A queue follows First In, First Out.'),
+        make('What does HTTP primarily define?',['Rules for transferring web resources','A programming language','A CPU architecture','A database table'],0,'HTTP defines communication rules for web resources.'),
+        make('Which number system uses only 0 and 1?',['Decimal','Octal','Binary','Hexadecimal'],2,'Binary uses only 0 and 1.'),
+        make('Which data structure follows LIFO order?',['Queue','Stack','Array','Graph'],1,'A stack follows Last In, First Out.'),
+        make('What is a variable in programming?',['A named storage location or value reference','A monitor cable','A network router','A file extension only'],0,'A variable represents stored or referenced data.'),
+        make('What does HTML primarily describe?',['Structure of web pages','CPU instructions','Database encryption','Operating-system kernels'],0,'HTML describes the structure of web pages.'),
+        make('What is a database used for?',['Organizing and storing data','Displaying only images','Increasing CPU voltage','Cooling hardware'],0,'Databases organize and store data for retrieval and management.'),
+        make('What does debugging involve?',['Finding and fixing program errors','Increasing screen size','Installing a battery','Formatting paper'],0,'Debugging involves identifying and fixing software errors.'),
+        make('Which structure organizes data as nodes connected by edges?',['Graph','Stack','Queue','Variable'],0,'A graph consists of nodes connected by edges.')
+      ],
+      hard:[
+        make('What is the main purpose of hashing in many data structures?',['Mapping data to a fixed-size hash value','Increasing monitor resolution','Compressing every file','Creating electrical current'],0,'Hashing maps data to hash values for efficient operations such as lookup.'),
+        make('What is the time complexity of binary search on a sorted array?',['O(n²)','O(n)','O(log n)','O(2ⁿ)'],2,'Binary search halves the search space each step, giving O(log n).'),
+        make('Which concept allows an object to take different forms through a common interface?',['Encapsulation','Polymorphism','Compilation','Iteration'],1,'Polymorphism allows different implementations through a common interface.'),
+        make('What does recursion mean in programming?',['A function calling itself directly or indirectly','Deleting all variables','Running only once','Converting code to binary'],0,'Recursion occurs when a function calls itself directly or indirectly.'),
+        make('What does Big-O notation describe?',['Growth of resource requirements with input size','Screen resolution','Keyboard layout','File ownership'],0,'Big-O describes asymptotic growth of time or space requirements.'),
+        make('Which traversal of a binary search tree produces sorted order?',['Preorder','Inorder','Postorder','Level order'],1,'Inorder traversal of a binary search tree produces values in sorted order.'),
+        make('What is encapsulation primarily about?',['Bundling data and behavior while controlling access','Sorting numbers only','Increasing clock speed','Deleting classes'],0,'Encapsulation combines data and related behavior while controlling access.'),
+        make('What does a compiler generally do?',['Translates source code into another executable or lower-level form','Measures network speed','Stores passwords only','Displays images'],0,'A compiler translates source code into a lower-level or executable form.'),
+        make('Which technique divides a problem into smaller overlapping subproblems and stores results?',['Dynamic programming','Random guessing','Linear scanning only','Manual sorting'],0,'Dynamic programming stores solutions to overlapping subproblems.'),
+        make('What is a race condition?',['A concurrency problem caused by timing of accesses to shared state','A CPU overheating method','A type of image format','A sorting algorithm'],0,'A race condition can occur when concurrent operations access shared state in an unsafe timing-dependent way.')
+      ]
+    },
+
+    cybersecurity:{
+      easy:[
+        make('What is malware?',['Malicious software','Manual hardware','Managed wireless network','Memory allocation'],0,'Malware is malicious software.'),
+        make('Which is sensitive authentication information?',['Password','Screen size','Wallpaper','Font'],0,'A password is authentication information.'),
+        make('What does antivirus software help detect?',['Malicious software','Keyboard layout','Screen brightness','Battery level'],0,'Antivirus software helps detect malicious software.'),
+        make('What does a strong password help protect?',['An account','Screen resolution','Battery life','Speaker volume'],0,'A strong password helps protect an account from unauthorized access.'),
+        make('Which is a common example of malware?',['Virus','Monitor','Keyboard','Printer'],0,'A virus is a type of malware.'),
+        make('What should you generally do with a suspicious link?',['Avoid opening it until verified','Open it immediately','Share it publicly','Enter your password'],0,'Suspicious links should be verified before opening.'),
+        make('What is software designed to block unauthorized network access called?',['Firewall','Keyboard','Compiler','Monitor'],0,'A firewall can control unauthorized network traffic.'),
+        make('Which information should generally be kept private?',['Password','Public website name','Weather','Screen size'],0,'Passwords should be kept private.'),
+        make('What does authentication verify?',['Identity','Screen brightness','File size','Internet speed'],0,'Authentication verifies the identity of a user or system.'),
+        make('What is a security update intended to do?',['Fix vulnerabilities and other issues','Increase monitor size','Change keyboard material','Remove electricity'],0,'Security updates can fix known vulnerabilities.')
+      ],
+      medium:[
+        make('What is phishing?',['A fraudulent attempt to obtain sensitive information','A CPU cooling method','A file-compression method','A programming language'],0,'Phishing uses deception to obtain sensitive information.'),
+        make('What does encryption do?',['Transforms data into a protected encoded form','Deletes all data','Increases screen size','Removes passwords'],0,'Encryption transforms data into an encoded form.'),
+        make('What is two-factor authentication designed to provide?',['An additional verification factor','Faster downloads','More storage','A larger display'],0,'2FA adds an additional verification factor.'),
+        make('What is a firewall primarily used for?',['Controlling network traffic','Editing photos','Increasing RAM','Printing documents'],0,'A firewall controls network traffic according to security rules.'),
+        make('What is social engineering?',['Manipulating people to obtain information or actions','Compressing files','Repairing hardware','Increasing CPU speed'],0,'Social engineering targets human behavior rather than only technical systems.'),
+        make('What is a vulnerability?',['A weakness that can be exploited','A type of monitor','A password manager','A backup cable'],0,'A vulnerability is a weakness that may be exploited.'),
+        make('What is multi-factor authentication?',['Using multiple authentication factors','Using multiple monitors','Using multiple keyboards','Using multiple file types'],0,'MFA uses two or more authentication factors.'),
+        make('What is a security patch?',['An update that fixes security issues','A network cable','A password','A type of malware'],0,'A security patch addresses security vulnerabilities or related issues.'),
+        make('What is a backup useful for?',['Recovering data after loss or damage','Increasing processor speed','Blocking every virus automatically','Changing screen resolution'],0,'Backups provide a way to recover data after loss or damage.'),
+        make('What does authorization determine?',['What an authenticated user is allowed to access','Whether a screen is bright','Whether a file is compressed','Whether a keyboard works'],0,'Authorization determines permitted access after authentication.')
+      ],
+      hard:[
+        make('What security principle gives users only the access they need?',['Least privilege','Open access','Maximum privilege','Shared privilege'],0,'Least privilege limits access to what is necessary.'),
+        make('What is SQL injection?',['An attack that manipulates database queries through unsafe input','A hard-drive encryption method','An antivirus scan','A physical cable attack'],0,'SQL injection manipulates database queries through vulnerable input.'),
+        make('What does asymmetric cryptography use?',['A public and private key','Only one shared password','No keys','Only a username'],0,'Asymmetric cryptography uses a public/private key pair.'),
+        make('What is the purpose of a digital signature?',['Providing authenticity and integrity evidence','Increasing download speed','Compressing images','Creating RAM'],0,'Digital signatures can provide authenticity and integrity evidence.'),
+        make('What is a denial-of-service attack intended to affect?',['Availability of a service','Keyboard layout','File naming only','Screen color'],0,'Denial-of-service attacks target service availability.'),
+        make('What is privilege escalation?',['Gaining higher permissions than intended','Changing screen brightness','Compressing files','Updating a browser'],0,'Privilege escalation involves obtaining higher access rights than intended.'),
+        make('What is a zero-day vulnerability?',['A vulnerability unknown or not yet patched by the responsible party','A password with zero characters','A zero-byte file','A harmless image'],0,'A zero-day vulnerability is a vulnerability without an available fix or sufficient prior warning at the time of exploitation or disclosure.'),
+        make('What is a cryptographic hash generally designed to provide?',['A fixed-length digest of input data','A reversible password storage format','A monitor signal','A network cable'],0,'A cryptographic hash produces a fixed-length digest designed to be difficult to reverse.'),
+        make('What is a man-in-the-middle attack?',['Intercepting communication between parties','Deleting a keyboard driver','Increasing CPU temperature','Changing file extensions'],0,'A man-in-the-middle attack involves intercepting communications between parties.'),
+        make('What is defense in depth?',['Using multiple layers of security controls','Using only one password','Removing all security controls','Using one firewall rule'],0,'Defense in depth uses multiple complementary security layers.')
+      ]
+    },
+
+    artificialintelligence:{
+      easy:[
+        make('What is AI primarily concerned with?',['Systems performing tasks associated with human intelligence','Increasing battery size','Building monitors','Printing documents'],0,'AI concerns systems capable of tasks associated with human intelligence.'),
+        make('What is data used for in machine learning?',['Learning patterns or relationships','Charging computers','Replacing keyboards','Increasing screen brightness'],0,'Machine-learning systems learn patterns from data.'),
+        make('What is a machine-learning model?',['A learned representation used for predictions or decisions','A monitor','A keyboard layout','A storage cable'],0,'A trained model represents learned patterns and can make predictions or decisions.'),
+        make('What is training data?',['Data used to train a model','Data used only for printing','A type of hardware','A network cable'],0,'Training data is used during model training.'),
+        make('What does AI stand for?',['Artificial Intelligence','Automated Internet','Advanced Input','Applied Information'],0,'AI stands for Artificial Intelligence.'),
+        make('What is a prediction in machine learning?',['A model output based on input data','A hardware upgrade','A password','A network cable'],0,'A prediction is a model output generated from input data.'),
+        make('What is a dataset?',['A collection of data','A CPU','A keyboard','A monitor'],0,'A dataset is a collection of data.'),
+        make('What is an input to a model?',['Information supplied to the model','Only its output','A power cable','A monitor'],0,'Inputs are information supplied to a model.'),
+        make('What is an output from a model?',['The result produced by the model','A keyboard','A battery','A cable'],0,'The output is the result produced by a model.'),
+        make('What is machine learning?',['A method in which systems learn patterns from data','A type of monitor','A storage device','A keyboard layout'],0,'Machine learning enables systems to learn patterns from data.')
+      ],
+      medium:[
+        make('What is supervised learning?',['Learning from labeled examples','Learning without any data','Manually programming every answer','Deleting training data'],0,'Supervised learning uses labeled examples.'),
+        make('What is classification?',['Assigning an input to one or more categories','Sorting files only by size','Encrypting a drive','Increasing processor speed'],0,'Classification predicts categories or classes.'),
+        make('What is overfitting?',['When a model fits training data too closely and generalizes poorly','When a computer has too much RAM','When data is encrypted','When a model has no parameters'],0,'Overfitting harms performance on unseen data.'),
+        make('What is a feature in machine learning?',['An input variable used by a model','A computer cable','A monitor','A password'],0,'A feature is an input variable or measurable attribute.'),
+        make('What is regression?',['Predicting a continuous numerical value','Predicting only text labels','Encrypting data','Deleting data'],0,'Regression models continuous numerical outcomes.'),
+        make('Why is data split into training and testing sets?',['To evaluate generalization on unseen data','To increase monitor size','To remove all errors','To eliminate the need for data'],0,'A test set provides an evaluation on data not used for training.'),
+        make('What is an epoch in neural-network training?',['One complete pass through the training data','One neuron','One feature','One prediction only'],0,'An epoch is one complete pass through the training dataset.'),
+        make('What is a label in supervised learning?',['The target value associated with an example','A monitor name','A CPU model','A file extension'],0,'A label is the target value used for supervised learning.'),
+        make('What is a neural network inspired by?',['Networks of interconnected neurons in biological systems','Computer cables','Hard drives','Printers'],0,'Neural networks are loosely inspired by biological neural networks.'),
+        make('What is model evaluation used for?',['Measuring how well a model performs','Increasing RAM','Formatting a disk','Changing keyboard layout'],0,'Evaluation measures model performance using suitable metrics.')
+      ],
+      hard:[
+        make('What is gradient descent used for?',['Optimizing model parameters by reducing a loss function','Encrypting files','Creating networks','Increasing screen resolution'],0,'Gradient descent adjusts parameters to reduce a loss function.'),
+        make('What does a neural network learn during training?',['Parameters that help map inputs to outputs','Only file names','The computer password','Monitor resolution'],0,'Training adjusts network parameters.'),
+        make('Why is a validation set commonly used?',['To evaluate and tune a model during development','To replace all training data','To provide electricity','To store passwords'],0,'Validation data helps tune and evaluate a model during development.'),
+        make('What does precision measure in binary classification?',['The proportion of predicted positives that are actually positive','The proportion of all negatives','The total number of samples','Training time'],0,'Precision is true positives divided by predicted positives.'),
+        make('What does recall measure?',['The proportion of actual positives correctly identified','The proportion of predicted positives only','The number of features','The training duration'],0,'Recall is true positives divided by actual positives.'),
+        make('What is a loss function used for?',['Measuring the discrepancy between predictions and targets','Increasing screen brightness','Storing passwords','Connecting monitors'],0,'A loss function quantifies prediction error for optimization.'),
+        make('What is backpropagation used for?',['Computing gradients used to update neural-network parameters','Compressing images','Encrypting files','Sorting a database'],0,'Backpropagation computes gradients of the loss with respect to parameters.'),
+        make('What is regularization intended to reduce?',['Overfitting','Screen resolution','Network bandwidth','File size only'],0,'Regularization helps reduce overfitting.'),
+        make('What is a confusion matrix used for?',['Summarizing classification predictions','Training a keyboard','Compressing data','Increasing CPU speed'],0,'A confusion matrix summarizes predicted versus actual classes.'),
+        make('What is an activation function used for in a neural network?',['Introducing nonlinearity into the model','Storing files','Encrypting passwords','Increasing RAM'],0,'Activation functions introduce nonlinear behavior into neural networks.')
+      ]
+    },
+
+    english:{
+      easy:[
+        make('Which word is a noun?',['Run','Beautiful','Teacher','Quickly'],2,'Teacher is a noun.'),
+        make('Which word is a verb?',['Happy','Run','Blue','Slowly'],1,'Run can function as a verb.'),
+        make('What is the plural of “child”?',['Childs','Childes','Children','Childrens'],2,'The plural of child is children.'),
+        make('Which punctuation mark normally ends a direct question?',['Comma','Full stop','Question mark','Colon'],2,'A direct question normally ends with a question mark.'),
+        make('Which word is an adjective?',['Beautiful','Quickly','Run','Teacher'],0,'Beautiful is an adjective.'),
+        make('Which word is a pronoun?',['He','House','Run','Blue'],0,'He is a pronoun.'),
+        make('What is the opposite of “hot”?',['Warm','Cold','Dry','Bright'],1,'The opposite of hot is cold.'),
+        make('Which word is spelled correctly?',['Recieve','Receive','Receeve','Receve'],1,'Receive is the correct spelling.'),
+        make('Which punctuation mark separates items in a simple list?',['Comma','Question mark','Apostrophe','Hyphen'],0,'Commas commonly separate items in a list.'),
+        make('Which word is an adverb?',['Quickly','Quick','Quickness','Quicken'],0,'Quickly is an adverb.')
+      ],
+      medium:[
+        make('Which sentence uses the present perfect tense?',['She went home.','She has gone home.','She is going home.','She will go home.'],1,'Has gone is present perfect.'),
+        make('Neither Ali nor Ahmed ___ present.',['are','were','is','be'],2,'With neither...nor, the verb commonly agrees with the nearer subject; Ahmed is singular, so is is used.'),
+        make('What is the main purpose of a thesis statement?',['State the central claim or focus','List every source','End every paragraph','Define every word'],0,'A thesis states the central claim or focus.'),
+        make('Which sentence is in passive voice?',['Ali wrote the letter.','The letter was written by Ali.','Ali writes letters.','Ali will write.'],1,'The letter was written by Ali uses passive voice.'),
+        make('Which word is closest in meaning to “rapid”?',['Slow','Fast','Weak','Quiet'],1,'Rapid means fast or quick.'),
+        make('Which sentence contains a conjunction?',['She stayed because it rained.','She stayed quietly.','She stayed.','Quietly she stayed.'],0,'Because is a conjunction introducing a dependent clause.'),
+        make('Which is the comparative form of “good”?',['Gooder','Best','Better','More good'],2,'The comparative form of good is better.'),
+        make('Which sentence has correct subject-verb agreement?',['They is ready.','They are ready.','They am ready.','They be ready.'],1,'They takes the plural verb are.'),
+        make('What is a synonym?',['A word with a similar meaning','A word with opposite meaning','A punctuation mark','A verb tense'],0,'A synonym has a similar meaning.'),
+        make('Which sentence uses a modal verb?',['You should study.','You studying now.','You studied yesterday.','You study every day.'],0,'Should is a modal verb expressing advice or expectation.')
+      ],
+      hard:[
+        make('Which sentence contains a conditional structure?',['If it rains, we will stay home.','She reads every day.','They visited Lahore.','He is sleeping.'],0,'The sentence contains an if-clause expressing a condition.'),
+        make('Which device compares unlike things using “like” or “as”?',['Metaphor','Simile','Irony','Alliteration'],1,'A simile uses words such as like or as for comparison.'),
+        make('Which sentence is grammatically correct?',['Each students have a book.','Each student have a book.','Each student has a book.','Each students has a book.'],2,'Each is singular and takes the singular noun student and verb has.'),
+        make('Which word is closest in meaning to “ambiguous”?',['Certain','Unclear','Obvious','Exact'],1,'Ambiguous means unclear or open to more than one interpretation.'),
+        make('Which sentence uses a relative clause?',['The book that I bought is new.','I bought a book.','The book is new.','I read quickly.'],0,'That I bought is a relative clause modifying the book.'),
+        make('What is irony?',['A contrast between expectation and reality','A direct comparison using like','Repeated initial consonants','A list of synonyms'],0,'Irony commonly involves a contrast between expectation and reality.'),
+        make('Which sentence contains an infinitive?',['She wants to learn.','She learns quickly.','She learned yesterday.','She is learning.'],0,'To learn is an infinitive.'),
+        make('Which word is closest in meaning to “meticulous”?',['Careless','Careful and precise','Noisy','Temporary'],1,'Meticulous means very careful and precise.'),
+        make('Which sentence uses a semicolon appropriately?',['I studied; I passed the exam.','I studied; because I was tired.','I; studied for the exam.','I studied because; I was tired.'],0,'A semicolon can join closely related independent clauses.'),
+        make('Which literary device gives human qualities to non-human things?',['Personification','Hyperbole','Simile','Rhyme'],0,'Personification attributes human qualities to non-human things.')
+      ]
+    }
   };
 
   const subjectKey=
@@ -530,32 +748,48 @@ function getDifficultyQuestions(subject,difficulty,count){
     s.includes('cyber')?'cybersecurity':
     s.includes('artificial')||s==='ai'?'artificialintelligence':
     s.includes('comput')?'computing':
-    s.includes('english')?'english':'biology';
+    s.includes('english')?'english':
+    'biology';
 
-  let bank=banks[subjectKey]||banks.biology;
+  const bank=banks[subjectKey];
 
-  // Shuffle the question order.
-  const shuffled=[...bank].sort(()=>Math.random()-0.5);
+  let pool;
 
-  // Return exactly the requested number.
-  // This local fallback cannot create genuinely new material-based questions yet.
-  const out=[];
-  for(let i=0;i<count;i++){
-    const base=shuffled[i%shuffled.length];
-    out.push({
-      q:base[0],
-      a:[...base[1]],
-      c:base[2],
-      e:base[3]
-    });
+  if(d==='easy'){
+    pool=[...bank.easy];
+  }else if(d==='medium'){
+    pool=[...bank.medium];
+  }else if(d==='hard'){
+    pool=[...bank.hard];
+  }else{
+    pool=[...bank.easy,...bank.medium,...bank.hard];
   }
 
-  return out;
+  for(let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+
+  const unique=[];
+  const seen=new Set();
+
+  for(const item of pool){
+    const key=item.q.trim().toLowerCase();
+
+    if(!seen.has(key)){
+      seen.add(key);
+
+      unique.push({
+        q:item.q,
+        a:[...item.a],
+        c:item.c,
+        e:item.e
+      });
+    }
+  }
+
+  return unique.slice(0,requested);
                       }
-document.addEventListener('click',e=>{
-  const menu=document.querySelector('.home-menu');
-  if(menu && !menu.contains(e.target)) closeHomeMenu();
-});
 
 </script>
 </body>
