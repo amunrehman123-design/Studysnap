@@ -357,8 +357,8 @@ function closeHomeMenu(){
 window.addEventListener("load",()=>setTimeout(hideSplash,2200));
 function getDifficultyQuestions(subject,difficulty,count){
   const s=(subject||'').toLowerCase().trim();
-  const d=(difficulty||'mixed').toLowerCase().trim();
-  const requested=Math.max(1,parseInt(count,10)||10);
+  const d=String(difficulty||'mixed').toLowerCase().trim();
+  const requested=Math.max(1,Number(count)||10);
 
   const make=(q,a,c,e)=>({q,a,c,e});
 
@@ -701,6 +701,8 @@ if(d==='easy'){
   pool=[...bank.easy,...bank.medium,...bank.hard];
 }
 
+pool=pool.filter(q=>q && q.q && Array.isArray(q.a) && q.a.length>=2);
+
 // Repeat questions when the selected count is larger than the available bank.
 
   for(let i=pool.length-1;i>0;i--){
@@ -712,9 +714,9 @@ if(d==='easy'){
 const seen=new Set();
 
 for(const item of pool){
-  const key=item.q.trim().toLowerCase();
+  const key=String(item.q).trim().toLowerCase();
 
-  if(!seen.has(key)){
+  if(!seen.has(key) && Array.isArray(item.a) && item.a.length>=2){
     seen.add(key);
 
     unique.push({
@@ -724,7 +726,7 @@ for(const item of pool){
       e:item.e
     });
   }
-}
+                      }
 
 return unique.slice(0, Math.min(requested, unique.length));
                       }
