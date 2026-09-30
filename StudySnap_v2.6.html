@@ -267,19 +267,28 @@ function generateQuiz(){
   const subject=$('subject').value;
   const difficulty=$('difficulty').value;
   const language=$('language').value;
-  const count=parseInt($('count').value||10,10);
+  const count=Math.max(1,parseInt($('count').value||10,10));
   $('createStatus').textContent=photo&&!text
     ?'Photo selected. Offline demo cannot read arbitrary photos yet, so using the '+difficulty.toLowerCase()+' '+language+' practice bank.'
     :'Preparing your '+difficulty.toLowerCase()+' '+subject+' quiz in '+language+'...';
-  setTimeout(()=>startQuiz(getDifficultyQuestions(subject,difficulty,count),subject),250);
+  setTimeout(()=>{
+  const questions=getDifficultyQuestions(subject,difficulty,count);
+  if(!questions.length){
+    $('createStatus').textContent='No questions are available for this subject and difficulty.';
+    return;
+  }
+  startQuiz(questions,subject);
+},250);
 }
 
 function startQuiz(qs,title){
   currentQuiz=qs;currentIndex=0;score=0;answered=false;quizFinished=false;quizStarted=true;
-  userAnswers=qs.map(()=>({selected:null,answered:false,timedOut:false}));
-  window.quizTitleForSave=title; quizMode=$('mode')?.value||'practice';
+  userAnswers=qs.map(()=>({selected:null,answered:false,timedOut:false,correct:false}));
+  window.quizTitleForSave=title;
+quizMode=$('mode')?.value||'practice';
+if(quizMode!=='timed') quizMode='practice';
   clearInterval(timerInterval);
-  timeLeft=getQuizSeconds(qs.length);
+  timeLeft=Math.max(0,getQuizSeconds(qs.length));
   $('quizTitle').textContent=title+' Quiz';
   $('quizBadge').textContent=quizMode==='timed'?'⏱ Timed':'Practice';
   showPage('quiz');
