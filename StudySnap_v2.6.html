@@ -697,7 +697,7 @@ function getDifficultyQuestions(subject,difficulty,count){
     s.includes('english')?'english':
     'biology';
 
-  const bank=banks[subjectKey];
+  const bank=banks[subjectKey]||banks.biology;
 
   let pool;
 
@@ -711,7 +711,7 @@ if(d==='easy'){
   pool=[...bank.easy,...bank.medium,...bank.hard];
 }
 
-pool=pool.filter(q=>q && q.q && Array.isArray(q.a) && q.a.length>=2);
+pool=pool.filter(q=>q && String(q.q).trim() && Array.isArray(q.a) && q.a.length>=2 && Number.isInteger(q.c) && q.c>=0 && q.c<q.a.length);
 
 // Repeat questions when the selected count is larger than the available bank.
 
